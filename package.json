@@ -1,0 +1,17 @@
+{
+  "name": "AlanVoice",
+  "version": "0.0.1",
+  "description": "AlanVoice",
+  "cordova": {
+    "id": "cordova-plugin-alan",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "author": "",
+  "license": "ISC"
+}

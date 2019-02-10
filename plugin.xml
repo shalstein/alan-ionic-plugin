@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-alan" version="0.0.1"
+    xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>AlanVoice</name>
+    
+    
+    <platform name="ios">
+        <js-module name="AlanVoice" src="www/AlanVoice.js">
+            <clobbers target="cordova.plugins.AlanVoice" />
+        </js-module>
+
+        <config-file parent="/*" target="config.xml">
+            <feature name="AlanVoice">
+            <param name="ios-package" value="AlanVoice" />
+            </feature>
+        </config-file>
+        <source-file src="src/ios/AlanVoice.m" />
+    </platform>
+
+    <platform name="android">
+      <js-module src="www/AlanVoice.js" name="AlanVoice">
+        <clobbers target="AlanVoice" />
+      </js-module>
+      <config-file target="res/xml/config.xml" parent="/*">
+        <feature name="AlanVoice">
+          <param name="android-package" value="com.alan.alanvoice.AlanVoice" />
+          <param name="onload" value="true" />
+        </feature>
+      </config-file>
+      
+      <source-file src="src/android/com/alan/alanvoice/AlanVoice.java" target-dir="src/com/alan/alanvoice/" />
+      <framework src="src/android/com/alan/sdk/alan_sdk.gradle" custom="true" type="gradleReference" />
+      <lib-file src="src/android/com/alan/sdk/alan_sdk.aar" />
+
+    </platform>
+
+</plugin>
