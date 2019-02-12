@@ -16,6 +16,10 @@ import com.alan.alansdk.button.AlanButton;
 import com.alan.alansdk.BasicSdkListener;
 import android.support.annotation.NonNull;
 
+import org.apache.cordova.PermissionHelper;
+import android.Manifest;
+
+
 
 
 public class AlanVoice extends CordovaPlugin {
@@ -23,7 +27,12 @@ public class AlanVoice extends CordovaPlugin {
     private static final String TAG = "plugins.AlanVoice";
     private DialogState alanState;
     private Alan sdk;
-    private AlanStateListener stateListener = new AlanStateListener();
+    private AlanStateListener stateListener = null;
+    private CallbackContext callbackContext = null;
+
+    public static String[]  permissions = { Manifest.permission.RECORD_AUDIO };
+    public static int RECORD_AUDIO = 0;
+
 
 
     public void initialize(CordovaInterface cordova, CordovaWebView webView){
@@ -33,14 +42,6 @@ public class AlanVoice extends CordovaPlugin {
         this.sdk = Alan.getInstance();
         this.sdk.init("f18a4135b0857d6ee7fe2f0078af3aeb2e956eca572e1d8b807a3e2338fdd0dc/stage");
         this.alanState = DialogState.IDLE;
-        this.sdk.registerCallback(this.stateListener);
-
-
-
-        // if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-        //     ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), PERMISSION_REQUEST_CODE);
-        // }
-
     }
 
     private void start()
@@ -48,21 +49,31 @@ public class AlanVoice extends CordovaPlugin {
         if (this.sdk == null) {
             return;
         }
-        if (this.alanState != DialogState.IDLE)
-        {
-            this.sdk.turnOff();
-        }
-        else
-        {
-            this.sdk.turnOn();
-            this.sdk.record();
-            this.sdk.speak();
+
+        if (!PermissionHelper.hasPermission(this, permissions[RECORD_AUDIO])) {
+            getMicPermission(RECORD_AUDIO);
+        } else {
+        
+            if (this.alanState != DialogState.IDLE)
+            {
+                this.sdk.turnOff();
+            }
+            else
+            {
+                this.sdk.turnOn();
+                this.sdk.record();
+                this.sdk.speak();
+            }
         }
     }
 
     private DialogState getState()
     {
       return this.alanState;
+    }
+
+    protected void getMicPermission(int requestCode) {
+        PermissionHelper.requestPermission(this, requestCode, permissions[RECORD_AUDIO]);
     }
 
 
@@ -72,6 +83,16 @@ public class AlanVoice extends CordovaPlugin {
             Log.d(TAG, "this is awesome");
         }
         else if(action.equals("start")) {
+
+
+            if(this.callbackContext == null){
+                this.callbackContext = callbackContext;
+                PluginResult dialogState = new PluginResult(PluginResult.Status.NO_RESULT);
+                dialogState.setKeepCallback(true);
+                this.callbackContext.sendPluginResult(dialogState);
+                this.stateListener = new AlanStateListener();
+                this.sdk.registerCallback(this.stateListener);
+            }
             this.start();
         }
         else if(action.equals("getState")) {
@@ -80,7 +101,7 @@ public class AlanVoice extends CordovaPlugin {
         }
         else if(action.equals("greet")) {
 
-            String name = data.getString(0);
+            String name = args.getString(0);
             String message = "Hello, " + name;
             callbackContext.success(message);
 
@@ -95,6 +116,9 @@ public class AlanVoice extends CordovaPlugin {
         public void onDialogStateChanged(@NonNull DialogState dialogState)
         {
             AlanVoice.this.alanState = dialogState;
+            PluginResult state = new PluginResult(PluginResult.Status.OK, dialogState.name());
+            state.setKeepCallback(true);
+            AlanVoice.this.callbackContext.sendPluginResult(state);
         }
     }
 }

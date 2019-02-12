@@ -27,10 +27,18 @@
           <param name="onload" value="true" />
         </feature>
       </config-file>
+
+      
+      <config-file parent="/*" target="AndroidManifest.xml">
+          <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+      </config-file>
       
       <source-file src="src/android/com/alan/alanvoice/AlanVoice.java" target-dir="src/com/alan/alanvoice/" />
       <framework src="src/android/com/alan/sdk/alan_sdk.gradle" custom="true" type="gradleReference" />
       <lib-file src="src/android/com/alan/sdk/alan_sdk.aar" />
+
+
+
 
     </platform>
 
